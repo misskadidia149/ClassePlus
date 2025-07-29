@@ -1,0 +1,738 @@
+Je comprends parfaitement votre projet. Il s'agit de développer une application React JS similaire à Google Classroom avec des fonctionnalités supplémentaires pour la gestion des projets tutorés, en particulier pour:
+
+La création et gestion des groupes d'étudiants avec coordinateurs
+
+La soumission et correction des travaux
+
+Le suivi de l'avancement des projets
+
+Les interactions entre professeurs et étudiants
+
+Pour le nombre d'interfaces, en considérant les fonctionnalités demandées, vous aurez besoin d'au moins 15-20 interfaces principales (sans compter les modals et sous-composants). Voici une estimation:
+
+Pour les fonctionnalités communes:
+
+Page de connexion
+
+Tableau de bord principal
+
+Page de profil utilisateur
+
+Pour les professeurs:
+4. Création de classe/module
+5. Gestion des étudiants (ajout/affectation)
+6. Création de groupes (avec désignation coordinateur)
+7. Publication d'annonces
+8. Partage de documents
+9. Assignation de tâches
+10. Correction de travaux
+11. Messagerie (publique/privée)
+12. Suivi avancement projets
+
+Pour les étudiants:
+13. Rejoindre une classe
+14. Visualisation documents/tâches
+15. Soumission de travaux
+16. Espace groupe (coordinateur)
+17. Messagerie
+18. Visualisation corrections
+19. Suivi progression projet
+
+Le nombre exact peut varier selon comment vous organisez votre architecture, mais c'est une bonne base pour commencer. Dites-moi si vous voulez que je détaille plus une partie spécifique. voici notre projet en resumer je vais te donner nos que tu vas modifier et ajouter les fonctionnalite necessaire et restant dit oui
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  FiMenu, FiBell, FiMessageSquare, FiUsers, FiFileText, 
+  FiCheckCircle, FiUpload, FiPlus, FiSearch, FiDownload, 
+  FiSend, FiEdit2, FiFile, FiTrash2, FiPaperclip 
+} from 'react-icons/fi';
+import { BsThreeDotsVertical, BsCheckCircleFill } from 'react-icons/bs';
+import { RiProgress5Line } from 'react-icons/ri';
+import './TeacherDashboard.css';
+
+const TeacherDashboard = () => {
+  const [groups, setGroups] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [tasks, setTasks] = useState([]);
+  const [newTask, setNewTask] = useState({
+    title: '',
+    description: '',
+    deadline: '',
+    forGroup: 'all'
+  });
+  const [activeTab, setActiveTab] = useState('groups');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [notifications, setNotifications] = useState(3);
+  const [announcements, setAnnouncements] = useState([]);
+  const [documents, setDocuments] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [selectedMessage, setSelectedMessage] = useState(null);
+  const [newMessage, setNewMessage] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Simulated API call with enhanced data
+    const mockData = {
+      groups: [
+        { 
+          id: 1, 
+          name: 'Groupe Alpha', 
+          coordinator: 'Alice Koné', 
+          members: ['Alice Koné', 'Bob Diarra', 'Charlie Traoré'], 
+          progress: 65,
+          avatarColor: '#7F5AF0',
+          lastActivity: 'Il y a 2 heures'
+        },
+        { 
+          id: 2, 
+          name: 'Groupe Beta', 
+          coordinator: 'David Coulibaly', 
+          members: ['David Coulibaly', 'Eva Diallo', 'Frank Keita'], 
+          progress: 40,
+          avatarColor: '#2CB67D',
+          lastActivity: 'Aujourd\'hui'
+        },
+        { 
+          id: 3, 
+          name: 'Groupe Gamma', 
+          coordinator: 'Grace Ouattara', 
+          members: ['Grace Ouattara', 'Hugo Cissé', 'Ibrahim Bamba'], 
+          progress: 85,
+          avatarColor: '#FF7E6B',
+          lastActivity: 'Hier'
+        },
+      ],
+      tasks: [
+        { 
+          id: 1, 
+          title: 'Soumettre le chapitre 1', 
+          group: 'all', 
+          deadline: '2024-06-15', 
+          submitted: ['Groupe Alpha', 'Groupe Gamma'],
+          status: 'submitted',
+          description: 'Rédiger le premier chapitre du mémoire avec la problématique et les objectifs de recherche.'
+        },
+        { 
+          id: 2, 
+          title: 'Présentation intermédiaire', 
+          group: 'Groupe Beta', 
+          deadline: '2024-06-20', 
+          submitted: [],
+          status: 'pending',
+          description: 'Préparer une présentation PowerPoint de 10 slides maximum résumant l\'avancement du projet.'
+        },
+        { 
+          id: 3, 
+          title: 'Bibliographie annotée', 
+          group: 'all', 
+          deadline: '2024-06-25', 
+          submitted: ['Groupe Gamma'],
+          status: 'submitted',
+          description: 'Fournir une liste des références bibliographiques avec une brève description de chaque source.'
+        },
+      ],
+      announcements: [
+        {
+          id: 1,
+          content: 'La date limite pour le chapitre 1 a été prolongée jusqu\'au 20 juin',
+          date: '2024-05-25'
+        }
+      ],
+      documents: [
+        {
+          id: 1,
+          name: 'Guide du mémoire.pdf',
+          size: '2.4 MB',
+          date: '2024-05-10',
+          group: 'all'
+        }
+      ],
+      messages: [
+        {
+          id: 1,
+          sender: 'Groupe Alpha',
+          content: 'Nous avons une question sur le chapitre 2...',
+          date: '2024-06-12 10:30',
+          isPrivate: true
+        }
+      ]
+    };
+
+    setGroups(mockData.groups);
+    setTasks(mockData.tasks);
+    setAnnouncements(mockData.announcements);
+    setDocuments(mockData.documents);
+    setMessages(mockData.messages);
+  }, []);
+
+  const handleCreateGroup = () => {
+    const colors = ['#7F5AF0', '#2CB67D', '#FF7E6B', '#6B66FF', '#F9C74F'];
+    const newGroup = {
+      id: groups.length + 1,
+      name: `Nouveau Groupe ${groups.length + 1}`,
+      coordinator: '',
+      members: [],
+      progress: 0,
+      avatarColor: colors[groups.length % colors.length],
+      lastActivity: 'Maintenant'
+    };
+    setGroups([...groups, newGroup]);
+    setSelectedGroup(newGroup);
+  };
+
+  const handleCreateTask = () => {
+    const task = {
+      id: tasks.length + 1,
+      ...newTask,
+      submitted: [],
+      status: 'pending'
+    };
+    setTasks([...tasks, task]);
+    setNewTask({ title: '', description: '', deadline: '', forGroup: 'all' });
+    setActiveTab('tasks');
+  };
+
+  const handleAssignCoordinator = (groupId, memberName) => {
+    setGroups(groups.map(group => 
+      group.id === groupId ? { ...group, coordinator: memberName } : group
+    ));
+    if (selectedGroup?.id === groupId) {
+      setSelectedGroup({ ...selectedGroup, coordinator: memberName });
+    }
+  };
+
+  const handleUploadDocument = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const newDoc = {
+        id: documents.length + 1,
+        name: file.name,
+        date: new Date().toLocaleDateString(),
+        size: `${(file.size / 1024).toFixed(1)} KB`,
+        group: selectedGroup?.name || 'all'
+      };
+      setDocuments([...documents, newDoc]);
+    }
+  };
+
+  const handleSendMessage = () => {
+    if (!newMessage.trim()) return;
+    
+    const newMsg = {
+      id: messages.length + 1,
+      sender: 'Dr. H. Kassogue',
+      content: newMessage,
+      date: new Date().toLocaleString(),
+      isPrivate: !!selectedGroup
+    };
+    
+    setMessages([...messages, newMsg]);
+    setNewMessage('');
+  };
+
+  return (
+    <div className={`teacher-dashboard ${sidebarOpen ? 'sidebar-open' : ''}`}>
+      {/* Sidebar */}
+      <div className="sidebar">
+        <div className="sidebar-header">
+          <div className="app-logo">
+            <span className="logo-icon">C</span>
+            <span className="logo-text">Classroom ISTA</span>
+          </div>
+          <button className="menu-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
+            <FiMenu />
+          </button>
+        </div>
+
+        <nav className="sidebar-nav">
+          <ul>
+            <li className={activeTab === 'groups' ? 'active' : ''} onClick={() => setActiveTab('groups')}>
+              <FiUsers className="nav-icon" />
+              <span>Groupes</span>
+              {activeTab === 'groups' && <div className="active-indicator"></div>}
+            </li>
+            <li className={activeTab === 'tasks' ? 'active' : ''} onClick={() => setActiveTab('tasks')}>
+              <FiFileText className="nav-icon" />
+              <span>Tâches</span>
+              {activeTab === 'tasks' && <div className="active-indicator"></div>}
+            </li>
+            <li className={activeTab === 'progress' ? 'active' : ''} onClick={() => setActiveTab('progress')}>
+              <RiProgress5Line className="nav-icon" />
+              <span>Progression</span>
+              {activeTab === 'progress' && <div className="active-indicator"></div>}
+            </li>
+            <li className={activeTab === 'messages' ? 'active' : ''} onClick={() => setActiveTab('messages')}>
+              <FiMessageSquare className="nav-icon" />
+              <span>Messages</span>
+              {activeTab === 'messages' && <div className="active-indicator"></div>}
+            </li>
+          </ul>
+        </nav>
+
+        <div className="user-profile">
+          <div className="avatar">HK</div>
+          <div className="user-info">
+            <span className="name">Dr. H. Kassogue</span>
+            <span className="role">Enseignant</span>
+          </div>
+          <button className="user-menu">
+            <BsThreeDotsVertical />
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="main-content">
+        <header>
+          <div className="header-left">
+            <h1>
+              {activeTab === 'groups' && 'Gestion des Groupes'}
+              {activeTab === 'tasks' && 'Tâches et Travaux'}
+              {activeTab === 'progress' && 'Suivi de Progression'}
+              {activeTab === 'messages' && 'Messagerie'}
+            </h1>
+            {activeTab === 'groups' && selectedGroup && (
+              <div className="breadcrumb">
+                <span>Groupes</span>
+                <span className="divider">/</span>
+                <span>{selectedGroup.name}</span>
+              </div>
+            )}
+          </div>
+          <div className="header-right">
+            <button className="icon-button notification-badge" data-count={notifications}>
+              <FiBell />
+            </button>
+            <div className="search-bar">
+              <FiSearch className="search-icon" />
+              <input type="text" placeholder="Rechercher..." />
+            </div>
+          </div>
+        </header>
+
+        <div className="content-area">
+          {/* Groups Tab */}
+          {activeTab === 'groups' && (
+            <div className="groups-tab">
+              <div className="groups-list-container">
+                <div className="section-header">
+                  <h2>Vos Groupes</h2>
+                  <div className="actions">
+                    <button className="primary-button" onClick={handleCreateGroup}>
+                      <FiPlus /> Nouveau groupe
+                    </button>
+                  </div>
+                </div>
+
+                <div className="groups-grid">
+                  {groups.map(group => (
+                    <div 
+                      key={group.id} 
+                      className={`group-card ${selectedGroup?.id === group.id ? 'selected' : ''}`}
+                      onClick={() => setSelectedGroup(group)}
+                    >
+                      <div className="group-avatar" style={{ backgroundColor: group.avatarColor }}>
+                        {group.name.charAt(0)}
+                      </div>
+                      <div className="group-info">
+                        <h3>{group.name}</h3>
+                        <p className="last-activity">{group.lastActivity}</p>
+                        <div className="progress-container">
+                          <div className="progress-labels">
+                            <span>Progression</span>
+                            <span>{group.progress}%</span>
+                          </div>
+                          <div className="progress-bar">
+                            <div className="progress-fill" style={{ width: `${group.progress}%` }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {selectedGroup && (
+                <div className="group-details">
+                  <div className="section-header">
+                    <h2>{selectedGroup.name}</h2>
+                    <div className="group-actions">
+                      <button className="secondary-button">
+                        <FiDownload /> Exporter
+                      </button>
+                      <button className="primary-button">
+                        <FiSend /> Message
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="detail-section">
+                    <h3>Coordinateur</h3>
+                    <div className="coordinator-card">
+                      <div className="member-avatar">
+                        {selectedGroup.coordinator ? selectedGroup.coordinator.charAt(0) : '?'}
+                      </div>
+                      <div className="member-info">
+                        <span className="name">{selectedGroup.coordinator || 'Non assigné'}</span>
+                        <span className="role">Coordinateur</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="detail-section">
+                    <div className="section-header">
+                      <h3>Membres du Groupe ({selectedGroup.members.length})</h3>
+                      <button className="text-button">
+                        <FiPlus /> Ajouter
+                      </button>
+                    </div>
+                    <div className="members-list">
+                      {selectedGroup.members.map(member => (
+                        <div key={member} className="member-card">
+                          <div className="member-avatar">
+                            {member.charAt(0)}
+                          </div>
+                          <div className="member-info">
+                            <span className="name">{member}</span>
+                            {member === selectedGroup.coordinator && (
+                              <span className="badge">Coordinateur</span>
+                            )}
+                          </div>
+                          {!selectedGroup.coordinator && (
+                            <button 
+                              className="assign-button"
+                              onClick={() => handleAssignCoordinator(selectedGroup.id, member)}
+                            >
+                              Nommer
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="detail-section">
+                    <div className="section-header">
+                      <h3>Documents partagés</h3>
+                      <label className="text-button file-upload">
+                        <FiUpload /> Ajouter
+                        <input type="file" onChange={handleUploadDocument} style={{ display: 'none' }} />
+                      </label>
+                    </div>
+                    <div className="documents-list">
+                      {documents
+                        .filter(doc => doc.group === 'all' || doc.group === selectedGroup.name)
+                        .map(doc => (
+                          <div key={doc.id} className="document-card">
+                            <FiFile className="document-icon" />
+                            <div className="document-info">
+                              <h4>{doc.name}</h4>
+                              <p>{doc.size} • {doc.date}</p>
+                            </div>
+                            <div className="document-actions">
+                              <button className="icon-button">
+                                <FiDownload />
+                              </button>
+                              <button className="icon-button">
+                                <FiTrash2 />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+
+                  <div className="detail-section">
+                    <div className="section-header">
+                      <h3>Tâches du groupe</h3>
+                      <button className="text-button">
+                        Voir tout
+                      </button>
+                    </div>
+                    <div className="group-tasks">
+                      {tasks.filter(t => t.group === 'all' || t.group === selectedGroup.name).map(task => (
+                        <div key={task.id} className="task-mini-card" data-status={task.status}>
+                          <div className="task-info">
+                            <h4>{task.title}</h4>
+                            <p>Échéance: {task.deadline}</p>
+                          </div>
+                          <div className="task-status">
+                            {task.status === 'submitted' ? (
+                              <BsCheckCircleFill className="submitted-icon" />
+                            ) : (
+                              <div className="pending-dot"></div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Tasks Tab */}
+          {activeTab === 'tasks' && (
+            <div className="tasks-tab">
+              <div className="create-task-card">
+                <h2>Créer une nouvelle tâche</h2>
+                <div className="form-group">
+                  <label>Titre de la tâche</label>
+                  <input
+                    type="text"
+                    value={newTask.title}
+                    onChange={(e) => setNewTask({...newTask, title: e.target.value})}
+                    placeholder="Ex: Soumettre le chapitre 1"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea
+                    value={newTask.description}
+                    onChange={(e) => setNewTask({...newTask, description: e.target.value})}
+                    placeholder="Décrivez la tâche en détail..."
+                    rows="3"
+                  />
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Date limite</label>
+                    <input
+                      type="date"
+                      value={newTask.deadline}
+                      onChange={(e) => setNewTask({...newTask, deadline: e.target.value})}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Destinataires</label>
+                    <select
+                      value={newTask.forGroup}
+                      onChange={(e) => setNewTask({...newTask, forGroup: e.target.value})}
+                    >
+                      <option value="all">Tous les groupes</option>
+                      {groups.map(group => (
+                        <option key={group.id} value={group.name}>{group.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="form-actions">
+                  <button className="primary-button" onClick={handleCreateTask}>
+                    <FiUpload /> Publier la tâche
+                  </button>
+                </div>
+              </div>
+
+              <div className="tasks-list">
+                <div className="section-header">
+                  <h2>Tâches actives</h2>
+                  <div className="filter-options">
+                    <button className="filter-button active">Toutes</button>
+                    <button className="filter-button">En cours</button>
+                    <button className="filter-button">Soumises</button>
+                  </div>
+                </div>
+                
+                {tasks.map(task => (
+                  <div key={task.id} className="task-card" data-status={task.status}>
+                    <div className="task-header">
+                      <div className="task-title">
+                        <h3>{task.title}</h3>
+                        <span className="group-badge">
+                          {task.group === 'all' ? 'Tous groupes' : task.group}
+                        </span>
+                      </div>
+                      <div className="task-meta">
+                        <span className="deadline">Échéance: {task.deadline}</span>
+                        <button className="icon-button">
+                          <BsThreeDotsVertical />
+                        </button>
+                      </div>
+                    </div>
+                    <p className="task-description">{task.description}</p>
+                    <div className="task-footer">
+                      <div className="submission-info">
+                        <div className="submission-progress">
+                          <div className="progress-bar">
+                            <div 
+                              className="progress-fill" 
+                              style={{ width: `${(task.submitted.length / groups.length) * 100}%` }}
+                            ></div>
+                          </div>
+                          <span>{task.submitted.length}/{groups.length} soumissions</span>
+                        </div>
+                      </div>
+                      <button className="view-button">
+                        <FiEdit2 /> Voir les travaux
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Progress Tab */}
+          {activeTab === 'progress' && (
+            <div className="progress-tab">
+              <div className="section-header">
+                <h2>Progression des groupes</h2>
+                <div className="filter-options">
+                  <button className="filter-button active">Tous</button>
+                  <button className="filter-button">En retard</button>
+                  <button className="filter-button">À jour</button>
+                </div>
+              </div>
+              
+              <div className="progress-grid">
+                {groups.map(group => (
+                  <div key={group.id} className="progress-card">
+                    <div className="progress-header">
+                      <div className="group-avatar" style={{ backgroundColor: group.avatarColor }}>
+                        {group.name.charAt(0)}
+                      </div>
+                      <div className="group-info">
+                        <h3>{group.name}</h3>
+                        <p className="last-activity">{group.lastActivity}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="progress-container">
+                      <div className="progress-labels">
+                        <span>Progression globale</span>
+                        <span>{group.progress}%</span>
+                      </div>
+                      <div className="progress-bar">
+                        <div 
+                          className="progress-fill" 
+                          style={{ width: `${group.progress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    
+                    <div className="progress-steps">
+                      <div className="step">
+                        <div className={`step-icon ${group.progress > 0 ? 'completed' : ''}`}>
+                          {group.progress > 0 ? <BsCheckCircleFill /> : '1'}
+                        </div>
+                        <span>Thème</span>
+                      </div>
+                      <div className="step">
+                        <div className={`step-icon ${group.progress > 20 ? 'completed' : ''}`}>
+                          {group.progress > 20 ? <BsCheckCircleFill /> : '2'}
+                        </div>
+                        <span>Chap.1</span>
+                      </div>
+                      <div className="step">
+                        <div className={`step-icon ${group.progress > 40 ? 'completed' : ''}`}>
+                          {group.progress > 40 ? <BsCheckCircleFill /> : '3'}
+                        </div>
+                        <span>Chap.2</span>
+                      </div>
+                      <div className="step">
+                        <div className={`step-icon ${group.progress > 60 ? 'completed' : ''}`}>
+                          {group.progress > 60 ? <BsCheckCircleFill /> : '4'}
+                        </div>
+                        <span>Chap.3</span>
+                      </div>
+                      <div className="step">
+                        <div className={`step-icon ${group.progress > 80 ? 'completed' : ''}`}>
+                          {group.progress > 80 ? <BsCheckCircleFill /> : '5'}
+                        </div>
+                        <span>Soutenance</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Messages Tab */}
+          {activeTab === 'messages' && (
+            <div className="messages-tab">
+              <div className="messages-container">
+                <div className="conversations-list">
+                  <div className="section-header">
+                    <h2>Messages</h2>
+                    <button className="primary-button small">
+                      <FiPlus /> Nouveau
+                    </button>
+                  </div>
+                  
+                  <div className="search-bar">
+                    <FiSearch className="search-icon" />
+                    <input type="text" placeholder="Rechercher des messages..." />
+                  </div>
+                  
+                  {messages.map(msg => (
+                    <div 
+                      key={msg.id} 
+                      className={`conversation-card ${selectedMessage?.id === msg.id ? 'active' : ''}`}
+                      onClick={() => setSelectedMessage(msg)}
+                    >
+                      <div className="avatar" style={{ backgroundColor: msg.isPrivate ? '#7F5AF0' : '#2CB67D' }}>
+                        {msg.sender.charAt(0)}
+                      </div>
+                      <div className="conversation-info">
+                        <div className="conversation-header">
+                          <span className="name">{msg.sender}</span>
+                          <span className="time">{msg.date}</span>
+                        </div>
+                        <p className="last-message">{msg.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="conversation-detail">
+                  {selectedMessage ? (
+                    <>
+                      <div className="message-header">
+                        <h3>{selectedMessage.sender}</h3>
+                        <p className="message-date">{selectedMessage.date}</p>
+                      </div>
+                      <div className="message-content">
+                        <p>{selectedMessage.content}</p>
+                      </div>
+                      <div className="message-reply">
+                        <textarea 
+                          placeholder="Écrivez votre réponse..."
+                          value={newMessage}
+                          onChange={(e) => setNewMessage(e.target.value)}
+                        />
+                        <div className="reply-actions">
+                          <button className="icon-button">
+                            <FiPaperclip />
+                          </button>
+                          <button 
+                            className="primary-button small"
+                            onClick={handleSendMessage}
+                          >
+                            <FiSend /> Envoyer
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="empty-state">
+                      <FiMessageSquare size={48} className="icon" />
+                      <h3>Aucune conversation sélectionnée</h3>
+                      <p>Sélectionnez une conversation ou créez-en une nouvelle</p>
+                      <button className="primary-button">
+                        <FiPlus /> Nouveau message
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default TeacherDashboard;

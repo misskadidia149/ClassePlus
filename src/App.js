@@ -2,13 +2,18 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import AuthPage from './components/auth/AuthPage';  // Correction du nom d'import
 import Dashboard from './components/Dashboard';
+import EtudiantDashboard from './components/dashboard/StudentDashboard';
+import EnseignantDashboard from './components/dashboard/TeacherDashboard'; 
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/auth" element={<AuthPage />} />  {/* Correction du nom du composant */}
+        <Route path="/auth" element={<AuthPage />} /> 
+          <Route path="/etudiant" element={<EtudiantDashboard />} />
+        <Route path="/enseignant" element={<EnseignantDashboard />} />
+         {/* Correction du nom du composant */}
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <Dashboard />
