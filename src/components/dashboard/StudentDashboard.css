@@ -119,17 +119,14 @@
   background-color: rgba(127, 90, 240, 0.1);
 }
 
-.sidebar-nav li.active .nav-icon {
-  color: var(--primary-color);
-}
-
-.active-indicator {
+.sidebar-nav li.active::before {
+  content: '';
   position: absolute;
   left: 0;
   top: 0;
-  bottom: 0;
+  height: 100%;
   width: 4px;
-  background-color: var(--primary-color);
+  background: var(--primary-color);
   border-radius: 0 4px 4px 0;
 }
 
@@ -149,6 +146,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-left: auto;
+}
+
+.coordinator-badge {
+  background-color: rgba(44, 182, 125, 0.1);
+  color: var(--secondary-color);
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 12px;
   margin-left: auto;
 }
 
@@ -311,6 +317,84 @@ header {
   min-height: calc(100vh - var(--header-height));
 }
 
+/* Dashboard Tab */
+.dashboard-tab {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background-color: var(--light-color);
+  border-radius: var(--border-radius);
+  padding: 24px;
+  box-shadow: var(--box-shadow);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: var(--transition);
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: rgba(127, 90, 240, 0.1);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.stat-info h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.stat-info p {
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.dashboard-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.dashboard-section {
+  background-color: var(--light-color);
+  border-radius: var(--border-radius);
+  padding: 24px;
+  box-shadow: var(--box-shadow);
+}
+
+.view-all {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.view-all:hover {
+  text-decoration: underline;
+}
+
 /* Common Components */
 .primary-button {
   background-color: var(--primary-color);
@@ -333,39 +417,9 @@ header {
   box-shadow: 0 4px 8px rgba(127, 90, 240, 0.3);
 }
 
-.primary-button:active {
-  transform: translateY(0);
-}
-
-.primary-button svg {
-  margin-right: 8px;
-}
-
 .primary-button.small {
   padding: 8px 16px;
   font-size: 0.8rem;
-}
-
-.secondary-button {
-  background-color: var(--light-color);
-  color: var(--primary-color);
-  border: 1px solid var(--primary-color);
-  padding: 12px 20px;
-  border-radius: var(--border-radius-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: var(--transition);
-  display: flex;
-  align-items: center;
-  font-size: 0.9rem;
-}
-
-.secondary-button:hover {
-  background-color: rgba(127, 90, 240, 0.1);
-}
-
-.secondary-button svg {
-  margin-right: 8px;
 }
 
 .text-button {
@@ -481,11 +535,12 @@ header {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-color: var(--primary-light);
-  color: var(--primary-color);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
   flex-shrink: 0;
 }
 
@@ -508,6 +563,18 @@ header {
   font-size: 0.9rem;
   line-height: 1.6;
   margin-bottom: 16px;
+}
+
+.class-stats {
+  display: flex;
+  gap: 16px;
+  margin: 12px 0;
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+.class-stats svg {
+  margin-right: 4px;
 }
 
 .progress-container {
@@ -628,6 +695,12 @@ header {
 .deadline {
   color: var(--text-light);
   font-size: 0.9rem;
+}
+
+.task-class {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  margin-top: 8px;
 }
 
 .task-status {
@@ -951,7 +1024,7 @@ header {
 
 /* Group Tab Styles */
 .group-tab {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -959,19 +1032,20 @@ header {
   display: flex;
   align-items: center;
   margin-bottom: 32px;
+  gap: 24px;
 }
 
 .group-avatar {
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
+  background-color: var(--primary-color);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: bold;
-  color: white;
-  margin-right: 20px;
   flex-shrink: 0;
 }
 
@@ -984,6 +1058,7 @@ header {
   display: flex;
   gap: 16px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .coordinator {
@@ -998,107 +1073,109 @@ header {
 
 .coordinator-badge {
   font-size: 0.8rem;
-  background-color: rgba(127, 90, 240, 0.1);
-  color: var(--primary-color);
+  background-color: rgba(44, 182, 125, 0.1);
+  color: var(--secondary-color);
   padding: 4px 8px;
   border-radius: 12px;
+  font-weight: 500;
 }
 
-.progress-card {
-  margin-bottom: 24px;
+.group-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
 }
 
-.progress-card h3 {
+.group-section {
+  background-color: var(--light-color);
+  border-radius: var(--border-radius);
+  padding: 24px;
+  box-shadow: var(--box-shadow);
+}
+
+.group-section h3 {
   margin-bottom: 16px;
+  color: var(--dark-color);
 }
 
 .progress-container {
   margin-bottom: 24px;
 }
 
-.progress-labels {
+.milestones-list {
+  margin-top: 16px;
+}
+
+.milestones-list h4 {
+  margin-bottom: 12px;
+  font-size: 1rem;
+  color: var(--dark-color);
+}
+
+.milestone-item {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  font-size: 0.9rem;
-}
-
-.progress-labels span:first-child {
-  color: var(--text-light);
-}
-
-.progress-labels span:last-child {
-  color: var(--primary-color);
-  font-weight: 500;
-}
-
-.progress-bar {
-  height: 8px;
-  background-color: var(--gray-medium);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background-color: var(--primary-color);
-  border-radius: 4px;
-  transition: width 0.5s ease;
-}
-
-.progress-steps {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 24px;
-  position: relative;
-}
-
-.progress-steps::before {
-  content: '';
-  position: absolute;
-  top: 20px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background-color: var(--gray-medium);
-  z-index: 1;
-}
-
-.step {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  z-index: 2;
-  flex: 1;
+  padding: 12px;
+  background-color: var(--gray-light);
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 8px;
+  gap: 12px;
 }
 
-.step-icon {
-  width: 40px;
-  height: 40px;
+.milestone-checkbox {
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background-color: var(--gray-light);
+  background-color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: var(--text-light);
-  transition: var(--transition);
+  flex-shrink: 0;
 }
 
-.step-icon.completed {
+.milestone-checkbox.completed {
   background-color: var(--secondary-color);
   color: white;
 }
 
-.step span {
-  font-size: 0.8rem;
-  color: var(--text-light);
-  text-align: center;
+.empty-circle {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--gray-dark);
 }
 
-.members-card {
-  margin-bottom: 24px;
+.milestone-info {
+  flex: 1;
+}
+
+.milestone-info h5 {
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.milestone-date {
+  font-size: 0.7rem;
+  color: var(--text-light);
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.icon-btn:hover {
+  background-color: var(--gray-light);
+  color: var(--primary-color);
 }
 
 .members-list {
@@ -1114,6 +1191,7 @@ header {
   border-radius: var(--border-radius-sm);
   transition: var(--transition);
   background-color: var(--gray-light);
+  gap: 12px;
 }
 
 .member-avatar {
@@ -1126,7 +1204,7 @@ header {
   justify-content: center;
   font-weight: bold;
   color: white;
-  margin-right: 12px;
+  flex-shrink: 0;
 }
 
 .member-info {
@@ -1161,10 +1239,6 @@ header {
   background-color: rgba(127, 90, 240, 0.1);
 }
 
-.group-documents-card {
-  margin-bottom: 24px;
-}
-
 .documents-list {
   display: flex;
   flex-direction: column;
@@ -1177,11 +1251,11 @@ header {
   padding: 12px;
   background-color: var(--gray-light);
   border-radius: var(--border-radius-sm);
+  gap: 12px;
 }
 
 .document-info {
   flex: 1;
-  margin-left: 12px;
 }
 
 .document-name {
@@ -1194,64 +1268,98 @@ header {
   color: var(--text-light);
 }
 
-.download-button {
+.document-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.delete-button {
   background: none;
   border: none;
-  color: var(--primary-color);
+  color: var(--accent-color);
   cursor: pointer;
 }
 
-.group-tasks-card {
-  margin-bottom: 24px;
+.group-discussion {
+  display: flex;
+  flex-direction: column;
+  height: 400px;
 }
 
-.tasks-mini-list {
+.messages-list {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.mini-task-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.message-item {
+  max-width: 80%;
   padding: 12px;
   border-radius: var(--border-radius-sm);
+}
+
+.message-item.sent {
+  align-self: flex-end;
+  background-color: var(--primary-color);
+  color: white;
+  border-bottom-right-radius: 0;
+}
+
+.message-item.received {
+  align-self: flex-start;
   background-color: var(--gray-light);
-  transition: var(--transition);
+  border-bottom-left-radius: 0;
 }
 
-.mini-task-card:hover {
-  background-color: var(--gray-medium);
-}
-
-.mini-task-card[data-status="submitted"] {
-  border-left: 3px solid var(--primary-color);
-}
-
-.mini-task-card[data-status="graded"] {
-  border-left: 3px solid var(--secondary-color);
-}
-
-.mini-task-card .task-info h4 {
-  font-size: 0.9rem;
+.message-header {
+  display: flex;
+  justify-content: space-between;
   margin-bottom: 4px;
-  font-weight: 500;
+  font-size: 0.8rem;
 }
 
-.mini-task-card .task-info p {
-  font-size: 0.8rem;
+.message-item.sent .message-header {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.message-item.received .message-header {
   color: var(--text-light);
 }
 
-.submitted-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background-color: var(--primary-color);
+.message-input {
+  display: flex;
+  gap: 8px;
 }
 
-/* Announcements Tab Styles */
+.message-input input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--gray-medium);
+  border-radius: var(--border-radius-sm);
+}
+
+.send-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Announcements Tab */
 .announcements-tab {
   max-width: 800px;
   margin: 0 auto;
@@ -1316,6 +1424,17 @@ header {
   line-height: 1.6;
 }
 
+.important-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background-color: var(--warning-color);
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
 .unread-badge {
   position: absolute;
   top: -6px;
@@ -1327,7 +1446,7 @@ header {
   border-radius: 10px;
 }
 
-/* Messages Tab Styles */
+/* Messages Tab */
 .messages-tab {
   height: calc(100vh - var(--header-height) - 64px);
 }
@@ -1409,7 +1528,7 @@ header {
 .conversation-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
 }
 
 .conversation-header .name {
@@ -1420,18 +1539,28 @@ header {
 }
 
 .conversation-header .time {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   color: var(--text-light);
   flex-shrink: 0;
   margin-left: 8px;
 }
 
 .last-message {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: var(--text-light);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.private-badge {
+  font-size: 0.7rem;
+  background-color: rgba(127, 90, 240, 0.1);
+  color: var(--primary-color);
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-top: 4px;
+  display: inline-block;
 }
 
 .empty-conversations {
@@ -1465,7 +1594,7 @@ header {
 }
 
 .author-info h3 {
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
 }
 
 .message-date {
@@ -1489,7 +1618,6 @@ header {
   padding: 12px;
   border: 1px solid var(--gray-medium);
   border-radius: var(--border-radius-sm);
-  font-size: 0.9rem;
   min-height: 100px;
   resize: none;
   margin-bottom: 12px;
@@ -1498,10 +1626,9 @@ header {
 .reply-actions {
   display: flex;
   justify-content: space-between;
-  align-items: center;
 }
 
-/* Responsive Styles */
+/* Responsive Design */
 @media (max-width: 1200px) {
   .tasks-tab {
     flex-direction: column;
@@ -1511,6 +1638,10 @@ header {
     width: 100%;
     position: static;
     margin-top: 30px;
+  }
+  
+  .group-sections {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1609,18 +1740,5 @@ header {
   
   .search-bar input:focus {
     width: 200px;
-  }
-  
-  .progress-steps {
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-  
-  .progress-steps::before {
-    display: none;
-  }
-  
-  .step {
-    flex: 0 0 calc(50% - 8px);
   }
 }

@@ -3,7 +3,8 @@ import {
   FiMenu, FiBell, FiMessageSquare, FiUsers, 
   FiFileText, FiCheckCircle, FiUpload, FiDownload,
   FiSearch, FiSend, FiPlus, FiChevronRight, FiUserPlus,
-  FiBook, FiHome, FiCalendar, FiClipboard, FiAward, FiFile
+  FiBook, FiHome, FiCalendar, FiClipboard, FiAward, FiFile,
+  FiEdit2, FiTrash2, FiShare2, FiMoreVertical,FiPaperclip
 } from 'react-icons/fi';
 import { BsThreeDotsVertical, BsCheckCircleFill, BsPeopleFill } from 'react-icons/bs';
 import { RiProgress5Line, RiFeedbackLine } from 'react-icons/ri';
@@ -11,53 +12,69 @@ import { MdOutlineClass, MdOutlineAssignmentTurnedIn } from 'react-icons/md';
 import './StudentDashboard.css';
 
 const StudentDashboard = () => {
-  const [group, setGroup] = useState(null);
-  const [tasks, setTasks] = useState([]);
-  const [announcements, setAnnouncements] = useState([]);
-  const [submission, setSubmission] = useState('');
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [activeTab, setActiveTab] = useState('tasks');
+  // États principaux
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [notifications, setNotifications] = useState(2);
+  const [notifications, setNotifications] = useState(3);
+  const [user, setUser] = useState({
+    name: 'Alice Koné',
+    role: 'Étudiant',
+    isCoordinator: true,
+    avatar: 'AK'
+  });
+
+  // Données des classes
   const [classes, setClasses] = useState([]);
   const [availableClasses, setAvailableClasses] = useState([]);
+  
+  // Données des tâches
+  const [tasks, setTasks] = useState([]);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [submission, setSubmission] = useState('');
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  
+  // Données du groupe
+  const [group, setGroup] = useState(null);
+  const [groupMessages, setGroupMessages] = useState([]);
+  const [newGroupMessage, setNewGroupMessage] = useState('');
+  
+  // Annonces
+  const [announcements, setAnnouncements] = useState([]);
+  
+  // Messagerie
   const [messages, setMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [newMessage, setNewMessage] = useState('');
-  const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [isCoordinator, setIsCoordinator] = useState(false);
 
-  // Simulation de données améliorée
+  // Chargement des données initiales
   useEffect(() => {
-    const mockData = {
-      group: {
-        id: 1,
-        name: 'Groupe Alpha',
-        coordinator: 'Alice Koné',
-        members: ['Alice Koné', 'Bob Diarra', 'Vous'],
-        progress: 65,
-        avatarColor: '#7F5AF0',
-        lastActivity: 'Il y a 2 heures',
-        documents: [
-          {
-            id: 1,
-            name: 'Plan de travail.pdf',
-            size: '1.2 MB',
-            date: '2024-05-10',
-            uploadedBy: 'Alice Koné'
-          }
-        ],
-        messages: [
-          {
-            id: 1,
-            sender: 'Alice Koné',
-            content: 'N\'oubliez pas de soumettre vos parties du chapitre 2 avant demain',
-            date: '2024-06-12 10:30',
-            read: false
-          }
-        ]
-      },
-      tasks: [
+    // Simuler le chargement des données
+    const loadData = () => {
+      // Classes
+      setClasses([
+        {
+          id: 1,
+          name: 'Mémoire de Fin d\'Études',
+          teacher: 'Dr. Kassogue',
+          progress: 65,
+          code: 'MFE-2024',
+          students: 15,
+          color: '#7F5AF0'
+        }
+      ]);
+
+      setAvailableClasses([
+        {
+          id: 2,
+          name: 'Méthodologie de Recherche',
+          teacher: 'Pr. Diallo',
+          description: 'Cours avancé sur les méthodes de recherche scientifique',
+          students: 20
+        }
+      ]);
+
+      // Tâches
+      setTasks([
         { 
           id: 1, 
           title: 'Soumettre le chapitre 1', 
@@ -68,7 +85,8 @@ const StudentDashboard = () => {
           grade: '16/20',
           feedback: 'Bon travail mais approfondir la partie méthodologie',
           files: ['chapitre1.pdf', 'bibliographie.docx'],
-          status: 'graded'
+          status: 'graded',
+          classId: 1
         },
         { 
           id: 2, 
@@ -77,66 +95,95 @@ const StudentDashboard = () => {
           deadline: '2024-06-20', 
           submitted: false, 
           graded: false,
-          status: 'pending'
-        },
-        { 
-          id: 3, 
-          title: 'Bibliographie annotée', 
-          description: 'Fournir une liste des références avec résumés',
-          deadline: '2024-06-25', 
-          submitted: true, 
-          graded: false,
-          status: 'submitted'
+          status: 'pending',
+          classId: 1
         }
-      ],
-      announcements: [
+      ]);
+
+      // Groupe
+      setGroup({
+        id: 1,
+        name: 'Groupe Alpha',
+        coordinator: 'Alice Koné',
+        members: [
+          { id: 1, name: 'Alice Koné', role: 'coordinator' },
+          { id: 2, name: 'Bob Diarra', role: 'member' },
+          { id: 3, name: 'Charlie Sarr', role: 'member' }
+        ],
+        progress: 65,
+        milestones: [
+          { id: 1, name: 'Proposition de sujet', completed: true, date: '2024-03-15' },
+          { id: 2, name: 'Chapitre 1', completed: true, date: '2024-05-10' },
+          { id: 3, name: 'Chapitre 2', completed: false, date: '2024-06-20' },
+          { id: 4, name: 'Chapitre 3', completed: false, date: '2024-07-15' }
+        ],
+        documents: [
+          {
+            id: 1,
+            name: 'Plan de travail.pdf',
+            size: '1.2 MB',
+            date: '2024-05-10',
+            uploadedBy: 'Alice Koné'
+          }
+        ]
+      });
+
+      // Messages du groupe
+      setGroupMessages([
+        {
+          id: 1,
+          sender: 'Alice Koné',
+          content: 'N\'oubliez pas de soumettre vos parties du chapitre 2 avant demain',
+          date: '2024-06-12 10:30',
+          read: true
+        },
+        {
+          id: 2,
+          sender: 'Bob Diarra',
+          content: 'J\'ai terminé ma partie, je vais vous l\'envoyer ce soir',
+          date: '2024-06-12 14:15',
+          read: true
+        }
+      ]);
+
+      // Annonces
+      setAnnouncements([
         {
           id: 1,
           content: 'La date limite pour le chapitre 1 a été prolongée jusqu\'au 20 juin',
           date: '2024-05-25',
           author: 'Dr. Kassogue',
+          important: true,
           read: false
         }
-      ],
-      availableClasses: [
+      ]);
+
+      // Messages privés
+      setMessages([
         {
           id: 1,
-          name: 'Mémoire de Fin d\'Études',
-          description: 'Encadrement des mémoires de fin d\'études',
-          teacher: 'Dr. Kassogue',
-          students: 15
+          sender: 'Dr. Kassogue',
+          content: 'Votre chapitre 1 a été corrigé, merci de consulter vos notes',
+          date: '2024-06-10 09:45',
+          read: true,
+          private: true
         }
-      ],
-      currentClasses: [
-        {
-          id: 1,
-          name: 'Méthodologie de Recherche',
-          description: 'Cours avancé sur les méthodes de recherche scientifique',
-          teacher: 'Pr. Diallo',
-          progress: 45
-        }
-      ]
+      ]);
     };
 
-    setGroup(mockData.group);
-    setTasks(mockData.tasks);
-    setAnnouncements(mockData.announcements);
-    setAvailableClasses(mockData.availableClasses);
-    setClasses(mockData.currentClasses);
-    setMessages(mockData.group.messages);
-    setIsCoordinator(mockData.group.coordinator === 'Vous');
+    loadData();
   }, []);
 
-  // 13. Rejoindre une classe
+  // Fonction pour rejoindre une classe
   const handleJoinClass = (classId) => {
     const classToJoin = availableClasses.find(c => c.id === classId);
     if (classToJoin) {
-      setClasses([...classes, classToJoin]);
+      setClasses([...classes, { ...classToJoin, progress: 0 }]);
       setAvailableClasses(availableClasses.filter(c => c.id !== classId));
     }
   };
 
-  // 15. Soumission de travaux
+  // Fonction pour soumettre une tâche
   const handleTaskSubmission = (taskId) => {
     const updatedTasks = tasks.map(task => 
       task.id === taskId ? { 
@@ -152,20 +199,22 @@ const StudentDashboard = () => {
     setSelectedTask(null);
   };
 
+  // Fonction pour gérer l'upload de fichiers
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files).map(file => ({
       name: file.name,
       size: `${(file.size / 1024).toFixed(1)} KB`,
-      type: file.type
+      type: file.type.split('/')[1]
     }));
     setUploadedFiles([...uploadedFiles, ...files]);
   };
 
+  // Fonction pour supprimer un fichier uploadé
   const removeFile = (fileName) => {
     setUploadedFiles(uploadedFiles.filter(f => f.name !== fileName));
   };
 
-  // 16. Espace groupe (coordinateur)
+  // Fonction pour ajouter un document au groupe (coordinateur)
   const handleAddGroupDocument = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -174,7 +223,7 @@ const StudentDashboard = () => {
         name: file.name,
         size: `${(file.size / 1024).toFixed(1)} KB`,
         date: new Date().toLocaleDateString(),
-        uploadedBy: 'Vous'
+        uploadedBy: user.name
       };
       setGroup({
         ...group,
@@ -183,27 +232,52 @@ const StudentDashboard = () => {
     }
   };
 
-  // 17. Messagerie
+  // Fonction pour envoyer un message au groupe
+  const handleSendGroupMessage = () => {
+    if (!newGroupMessage.trim()) return;
+    
+    const newMsg = {
+      id: groupMessages.length + 1,
+      sender: user.name,
+      content: newGroupMessage,
+      date: new Date().toLocaleString(),
+      read: true
+    };
+    
+    setGroupMessages([newMsg, ...groupMessages]);
+    setNewGroupMessage('');
+  };
+
+  // Fonction pour envoyer un message privé
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
     
     const newMsg = {
       id: messages.length + 1,
-      sender: 'Vous',
+      sender: user.name,
       content: newMessage,
       date: new Date().toLocaleString(),
-      read: true
+      read: true,
+      private: true
     };
     
     setMessages([newMsg, ...messages]);
     setNewMessage('');
   };
 
-  // 18. Visualisation corrections
+  // Fonction pour marquer une annonce comme lue
   const markAnnouncementAsRead = (id) => {
     setAnnouncements(announcements.map(ann => 
       ann.id === id ? { ...ann, read: true } : ann
     ));
+  };
+
+  // Fonction pour supprimer un document du groupe (coordinateur)
+  const deleteGroupDocument = (docId) => {
+    setGroup({
+      ...group,
+      documents: group.documents.filter(doc => doc.id !== docId)
+    });
   };
 
   return (
@@ -222,33 +296,56 @@ const StudentDashboard = () => {
 
         <nav className="sidebar-nav">
           <ul>
-            <li className={activeTab === 'classes' ? 'active' : ''} onClick={() => setActiveTab('classes')}>
+            <li 
+              className={activeTab === 'dashboard' ? 'active' : ''} 
+              onClick={() => setActiveTab('dashboard')}
+            >
+              <FiHome className="nav-icon" />
+              <span>Tableau de bord</span>
+            </li>
+            
+            <li 
+              className={activeTab === 'classes' ? 'active' : ''} 
+              onClick={() => setActiveTab('classes')}
+            >
               <MdOutlineClass className="nav-icon" />
               <span>Mes Classes</span>
-              {activeTab === 'classes' && <div className="active-indicator"></div>}
             </li>
-            <li className={activeTab === 'tasks' ? 'active' : ''} onClick={() => setActiveTab('tasks')}>
+            
+            <li 
+              className={activeTab === 'tasks' ? 'active' : ''} 
+              onClick={() => setActiveTab('tasks')}
+            >
               <MdOutlineAssignmentTurnedIn className="nav-icon" />
               <span>Mes Tâches</span>
-              {activeTab === 'tasks' && <div className="active-indicator"></div>}
             </li>
-            <li className={activeTab === 'group' ? 'active' : ''} onClick={() => setActiveTab('group')}>
+            
+            <li 
+              className={activeTab === 'group' ? 'active' : ''} 
+              onClick={() => setActiveTab('group')}
+            >
               <FiUsers className="nav-icon" />
               <span>Mon Groupe</span>
-              {activeTab === 'group' && <div className="active-indicator"></div>}
+              {user.isCoordinator && <span className="coordinator-badge">Coordinateur</span>}
             </li>
-            <li className={activeTab === 'announcements' ? 'active' : ''} onClick={() => setActiveTab('announcements')}>
+            
+            <li 
+              className={activeTab === 'announcements' ? 'active' : ''} 
+              onClick={() => setActiveTab('announcements')}
+            >
               <FiBell className="nav-icon" />
               <span>Annonces</span>
-              {activeTab === 'announcements' && <div className="active-indicator"></div>}
               {announcements.filter(a => !a.read).length > 0 && (
                 <span className="notification-badge">{announcements.filter(a => !a.read).length}</span>
               )}
             </li>
-            <li className={activeTab === 'messages' ? 'active' : ''} onClick={() => setActiveTab('messages')}>
+            
+            <li 
+              className={activeTab === 'messages' ? 'active' : ''} 
+              onClick={() => setActiveTab('messages')}
+            >
               <FiMessageSquare className="nav-icon" />
               <span>Messagerie</span>
-              {activeTab === 'messages' && <div className="active-indicator"></div>}
               {messages.filter(m => !m.read).length > 0 && (
                 <span className="notification-badge">{messages.filter(m => !m.read).length}</span>
               )}
@@ -257,10 +354,10 @@ const StudentDashboard = () => {
         </nav>
 
         <div className="user-profile">
-          <div className="avatar">VS</div>
+          <div className="avatar">{user.avatar}</div>
           <div className="user-info">
-            <span className="name">Votre Nom</span>
-            <span className="role">Étudiant</span>
+            <span className="name">{user.name}</span>
+            <span className="role">{user.role}</span>
           </div>
           <button className="user-menu">
             <BsThreeDotsVertical />
@@ -273,6 +370,7 @@ const StudentDashboard = () => {
         <header>
           <div className="header-left">
             <h1>
+              {activeTab === 'dashboard' && 'Tableau de bord'}
               {activeTab === 'classes' && 'Mes Classes'}
               {activeTab === 'tasks' && 'Mes Tâches'}
               {activeTab === 'group' && 'Mon Groupe'}
@@ -299,6 +397,161 @@ const StudentDashboard = () => {
         </header>
 
         <div className="content-area">
+          {/* Tableau de bord */}
+          {activeTab === 'dashboard' && (
+            <div className="dashboard-tab">
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <div className="stat-icon">
+                    <MdOutlineClass size={24} />
+                  </div>
+                  <div className="stat-info">
+                    <h3>{classes.length}</h3>
+                    <p>Classes</p>
+                  </div>
+                </div>
+                
+                <div className="stat-card">
+                  <div className="stat-icon">
+                    <MdOutlineAssignmentTurnedIn size={24} />
+                  </div>
+                  <div className="stat-info">
+                    <h3>{tasks.length}</h3>
+                    <p>Tâches</p>
+                  </div>
+                </div>
+                
+                <div className="stat-card">
+                  <div className="stat-icon">
+                    <RiProgress5Line size={24} />
+                  </div>
+                  <div className="stat-info">
+                    <h3>{group?.progress}%</h3>
+                    <p>Progression du projet</p>
+                  </div>
+                </div>
+                
+                <div className="stat-card">
+                  <div className="stat-icon">
+                    <FiBell size={24} />
+                  </div>
+                  <div className="stat-info">
+                    <h3>{announcements.length}</h3>
+                    <p>Annonces</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="dashboard-sections">
+                {/* Prochaines tâches */}
+                <div className="dashboard-section">
+                  <div className="section-header">
+                    <h2>Prochaines tâches</h2>
+                    <button className="view-all">Voir tout</button>
+                  </div>
+                  <div className="tasks-list">
+                    {tasks.slice(0, 3).map(task => (
+                      <div 
+                        key={task.id} 
+                        className={`task-card ${task.status}`}
+                        onClick={() => {
+                          setSelectedTask(task);
+                          setActiveTab('tasks');
+                        }}
+                      >
+                        <div className="task-header">
+                          <h3>{task.title}</h3>
+                          <span className="deadline">Échéance: {task.deadline}</span>
+                        </div>
+                        <div className="task-status">
+                          {task.status === 'graded' && <BsCheckCircleFill className="graded-icon" />}
+                          <span className={`status-badge ${task.status}`}>
+                            {task.status === 'pending' && 'À faire'}
+                            {task.status === 'submitted' && 'Soumis'}
+                            {task.status === 'graded' && task.grade}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Dernières annonces */}
+                <div className="dashboard-section">
+                  <div className="section-header">
+                    <h2>Dernières annonces</h2>
+                    <button className="view-all">Voir tout</button>
+                  </div>
+                  <div className="announcements-list">
+                    {announcements.slice(0, 3).map(announcement => (
+                      <div 
+                        key={announcement.id} 
+                        className={`announcement-card ${!announcement.read ? 'unread' : ''}`}
+                        onClick={() => {
+                          markAnnouncementAsRead(announcement.id);
+                          setActiveTab('announcements');
+                        }}
+                      >
+                        <div className="announcement-header">
+                          <div className="announcement-author">
+                            <div className="author-avatar">
+                              {announcement.author.charAt(0)}
+                            </div>
+                            <span>{announcement.author}</span>
+                          </div>
+                          <div className="announcement-date">{announcement.date}</div>
+                        </div>
+                        <div className="announcement-content">
+                          {announcement.content}
+                        </div>
+                        {announcement.important && (
+                          <div className="important-badge">Important</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Progression du groupe */}
+                {group && (
+                  <div className="dashboard-section">
+                    <div className="section-header">
+                      <h2>Progression du groupe</h2>
+                      <button 
+                        className="view-all"
+                        onClick={() => setActiveTab('group')}
+                      >
+                        Voir le groupe
+                      </button>
+                    </div>
+                    <div className="progress-container">
+                      <div className="progress-labels">
+                        <span>Progression globale</span>
+                        <span>{group.progress}%</span>
+                      </div>
+                      <div className="progress-bar">
+                        <div className="progress-fill" style={{ width: `${group.progress}%` }}></div>
+                      </div>
+                    </div>
+                    <div className="milestones-list">
+                      {group.milestones.slice(0, 3).map(milestone => (
+                        <div key={milestone.id} className="milestone-item">
+                          <div className={`milestone-checkbox ${milestone.completed ? 'completed' : ''}`}>
+                            {milestone.completed ? <BsCheckCircleFill /> : <div className="empty-circle" />}
+                          </div>
+                          <div className="milestone-info">
+                            <h4>{milestone.name}</h4>
+                            <span className="milestone-date">{milestone.date}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Classes Tab */}
           {activeTab === 'classes' && (
             <div className="classes-tab">
@@ -311,12 +564,13 @@ const StudentDashboard = () => {
                   {classes.map(cls => (
                     <div key={cls.id} className="class-card">
                       <div className="class-header">
-                        <div className="class-avatar">
-                          <FiBook size={24} />
+                        <div className="class-avatar" style={{ backgroundColor: cls.color }}>
+                          {cls.name.charAt(0)}
                         </div>
                         <div className="class-info">
                           <h3>{cls.name}</h3>
                           <p>Enseignant: {cls.teacher}</p>
+                          <p>Code: {cls.code}</p>
                         </div>
                       </div>
                       <div className="progress-container">
@@ -327,6 +581,9 @@ const StudentDashboard = () => {
                         <div className="progress-bar">
                           <div className="progress-fill" style={{ width: `${cls.progress}%` }}></div>
                         </div>
+                      </div>
+                      <div className="class-stats">
+                        <span><FiUsers /> {cls.students} étudiants</span>
                       </div>
                       <button className="primary-button">
                         Accéder à la classe
@@ -411,6 +668,9 @@ const StudentDashboard = () => {
                         </div>
                       </div>
                       <p className="task-description">{task.description}</p>
+                      <div className="task-class">
+                        {classes.find(c => c.id === task.classId)?.name}
+                      </div>
                     </div>
                   ))
                 ) : (
@@ -433,6 +693,12 @@ const StudentDashboard = () => {
                     <div className="meta-item">
                       <span className="meta-label">Date limite:</span>
                       <span className="meta-value">{selectedTask.deadline}</span>
+                    </div>
+                    <div className="meta-item">
+                      <span className="meta-label">Classe:</span>
+                      <span className="meta-value">
+                        {classes.find(c => c.id === selectedTask.classId)?.name}
+                      </span>
                     </div>
                     <div className="meta-item">
                       <span className="meta-label">Statut:</span>
@@ -549,157 +815,167 @@ const StudentDashboard = () => {
           {activeTab === 'group' && group && (
             <div className="group-tab">
               <div className="group-header">
-                <div className="group-avatar" style={{ backgroundColor: group.avatarColor }}>
+                <div className="group-avatar">
                   {group.name.charAt(0)}
                 </div>
                 <div className="group-info">
                   <h2>{group.name}</h2>
                   <div className="group-meta">
                     <span className="coordinator">Coordinateur: {group.coordinator}</span>
-                    <span className="last-activity">{group.lastActivity}</span>
-                    {isCoordinator && <span className="coordinator-badge">Vous êtes coordinateur</span>}
+                    <span className="last-activity">Dernière activité: Aujourd'hui</span>
+                    {user.isCoordinator && <span className="coordinator-badge">Vous êtes coordinateur</span>}
                   </div>
                 </div>
               </div>
 
-              <div className="card progress-card">
-                <h3>Progression du projet</h3>
-                <div className="progress-container">
-                  <div className="progress-labels">
-                    <span>Progression globale</span>
-                    <span>{group.progress}%</span>
-                  </div>
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: `${group.progress}%` }}></div>
-                  </div>
-                </div>
-                
-                <div className="progress-steps">
-                  <div className="step">
-                    <div className={`step-icon ${group.progress > 0 ? 'completed' : ''}`}>
-                      {group.progress > 0 ? <BsCheckCircleFill /> : '1'}
+              <div className="group-sections">
+                {/* Progression */}
+                <div className="group-section">
+                  <h3>Progression du projet</h3>
+                  <div className="progress-container">
+                    <div className="progress-labels">
+                      <span>Progression globale</span>
+                      <span>{group.progress}%</span>
                     </div>
-                    <span>Thème</span>
-                  </div>
-                  <div className="step">
-                    <div className={`step-icon ${group.progress > 20 ? 'completed' : ''}`}>
-                      {group.progress > 20 ? <BsCheckCircleFill /> : '2'}
+                    <div className="progress-bar">
+                      <div className="progress-fill" style={{ width: `${group.progress}%` }}></div>
                     </div>
-                    <span>Chap.1</span>
                   </div>
-                  <div className="step">
-                    <div className={`step-icon ${group.progress > 40 ? 'completed' : ''}`}>
-                      {group.progress > 40 ? <BsCheckCircleFill /> : '3'}
-                    </div>
-                    <span>Chap.2</span>
-                  </div>
-                  <div className="step">
-                    <div className={`step-icon ${group.progress > 60 ? 'completed' : ''}`}>
-                      {group.progress > 60 ? <BsCheckCircleFill /> : '4'}
-                    </div>
-                    <span>Chap.3</span>
-                  </div>
-                  <div className="step">
-                    <div className={`step-icon ${group.progress > 80 ? 'completed' : ''}`}>
-                      {group.progress > 80 ? <BsCheckCircleFill /> : '5'}
-                    </div>
-                    <span>Soutenance</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="card members-card">
-                <div className="section-header">
-                  <h3>Membres du groupe ({group.members.length})</h3>
-                  <button className="text-button">
-                    <FiMessageSquare /> Message
-                  </button>
-                </div>
-                <div className="members-list">
-                  {group.members.map(member => (
-                    <div key={member} className="member-card">
-                      <div className="member-avatar">
-                        {member.charAt(0)}
-                      </div>
-                      <div className="member-info">
-                        <span className="member-name">{member}</span>
-                        {member === group.coordinator && (
-                          <span className="member-role">Coordinateur</span>
-                        )}
-                        {member === 'Vous' && (
-                          <span className="member-role">Vous</span>
-                        )}
-                      </div>
-                      <button className="message-button">
-                        <FiSend />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="card group-documents-card">
-                <div className="section-header">
-                  <h3>Documents du groupe</h3>
-                  {isCoordinator && (
-                    <label className="text-button file-upload">
-                      <FiUpload /> Ajouter
-                      <input 
-                        type="file" 
-                        onChange={handleAddGroupDocument}
-                        style={{ display: 'none' }}
-                      />
-                    </label>
-                  )}
-                </div>
-                {group.documents.length > 0 ? (
-                  <div className="documents-list">
-                    {group.documents.map(doc => (
-                      <div key={doc.id} className="document-item">
-                        <FiFile className="file-icon" />
-                        <div className="document-info">
-                          <span className="document-name">{doc.name}</span>
-                          <span className="document-meta">
-                            {doc.size} • {doc.date} • {doc.uploadedBy}
-                          </span>
+                  
+                  <div className="milestones-list">
+                    <h4>Jalons</h4>
+                    {group.milestones.map(milestone => (
+                      <div key={milestone.id} className="milestone-item">
+                        <div className={`milestone-checkbox ${milestone.completed ? 'completed' : ''}`}>
+                          {milestone.completed ? <BsCheckCircleFill /> : <div className="empty-circle" />}
                         </div>
-                        <button className="download-button">
-                          <FiDownload />
+                        <div className="milestone-info">
+                          <h5>{milestone.name}</h5>
+                          <span className="milestone-date">{milestone.date}</span>
+                        </div>
+                        {user.isCoordinator && (
+                          <button className="icon-btn">
+                            <FiEdit2 size={16} />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Membres */}
+                <div className="group-section">
+                  <div className="section-header">
+                    <h3>Membres du groupe ({group.members.length})</h3>
+                    <button className="text-button">
+                      <FiMessageSquare /> Message
+                    </button>
+                  </div>
+                  <div className="members-list">
+                    {group.members.map(member => (
+                      <div key={member.id} className="member-card">
+                        <div className="member-avatar">
+                          {member.name.charAt(0)}
+                        </div>
+                        <div className="member-info">
+                          <span className="member-name">{member.name}</span>
+                          {member.role === 'coordinator' && (
+                            <span className="member-role">Coordinateur</span>
+                          )}
+                        </div>
+                        <button className="message-button">
+                          <FiSend />
                         </button>
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <div className="empty-state">
-                    <FiFile size={32} className="empty-icon" />
-                    <p>Aucun document partagé</p>
-                  </div>
-                )}
-              </div>
-
-              <div className="card group-tasks-card">
-                <div className="section-header">
-                  <h3>Tâches du groupe</h3>
-                  <button className="text-button">
-                    Voir tout
-                  </button>
                 </div>
-                <div className="tasks-mini-list">
-                  {tasks.filter(t => t.submitted).map(task => (
-                    <div key={task.id} className="mini-task-card" data-status={task.status}>
-                      <div className="task-info">
-                        <h4>{task.title}</h4>
-                        <p>Échéance: {task.deadline}</p>
-                      </div>
-                      <div className="task-status">
-                        {task.status === 'graded' ? (
-                          <BsCheckCircleFill className="graded-icon" />
-                        ) : (
-                          <div className="submitted-dot"></div>
-                        )}
-                      </div>
+
+                {/* Documents */}
+                <div className="group-section">
+                  <div className="section-header">
+                    <h3>Documents du groupe</h3>
+                    {user.isCoordinator && (
+                      <label className="text-button file-upload">
+                        <FiUpload /> Ajouter
+                        <input 
+                          type="file" 
+                          onChange={handleAddGroupDocument}
+                          style={{ display: 'none' }}
+                        />
+                      </label>
+                    )}
+                  </div>
+                  {group.documents.length > 0 ? (
+                    <div className="documents-list">
+                      {group.documents.map(doc => (
+                        <div key={doc.id} className="document-item">
+                          <FiFile className="file-icon" />
+                          <div className="document-info">
+                            <span className="document-name">{doc.name}</span>
+                            <span className="document-meta">
+                              {doc.size} • {doc.date} • {doc.uploadedBy}
+                            </span>
+                          </div>
+                          <div className="document-actions">
+                            <button className="download-button">
+                              <FiDownload />
+                            </button>
+                            {user.isCoordinator && (
+                              <button 
+                                className="delete-button"
+                                onClick={() => deleteGroupDocument(doc.id)}
+                              >
+                                <FiTrash2 />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  ) : (
+                    <div className="empty-state">
+                      <FiFile size={32} className="empty-icon" />
+                      <p>Aucun document partagé</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Discussion */}
+                <div className="group-section">
+                  <div className="section-header">
+                    <h3>Discussion de groupe</h3>
+                  </div>
+                  <div className="group-discussion">
+                    <div className="messages-list">
+                      {groupMessages.map(message => (
+                        <div key={message.id} className={`message-item ${message.sender === user.name ? 'sent' : 'received'}`}>
+                          <div className="message-header">
+                            <span className="sender">{message.sender}</span>
+                            <span className="time">{message.date}</span>
+                          </div>
+                          <div className="message-content">
+                            {message.content}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="message-input">
+                      <input
+                        type="text"
+                        placeholder="Écrire un message..."
+                        value={newGroupMessage}
+                        onChange={(e) => setNewGroupMessage(e.target.value)}
+                      />
+                      <button 
+                        className="send-button"
+                        onClick={handleSendGroupMessage}
+                        disabled={!newGroupMessage.trim()}
+                      >
+                        <FiSend />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -713,6 +989,7 @@ const StudentDashboard = () => {
                 <div className="filter-options">
                   <button className="filter-button active">Toutes</button>
                   <button className="filter-button">Non lues</button>
+                  <button className="filter-button">Importantes</button>
                 </div>
               </div>
               
@@ -736,6 +1013,9 @@ const StudentDashboard = () => {
                       <div className="announcement-content">
                         {announcement.content}
                       </div>
+                      {announcement.important && (
+                        <div className="important-badge">Important</div>
+                      )}
                       {!announcement.read && (
                         <div className="unread-badge">Nouveau</div>
                       )}
@@ -786,6 +1066,9 @@ const StudentDashboard = () => {
                             <span className="time">{message.date}</span>
                           </div>
                           <p className="last-message">{message.content}</p>
+                          {message.private && (
+                            <span className="private-badge">Privé</span>
+                          )}
                         </div>
                       </div>
                     ))
@@ -822,7 +1105,7 @@ const StudentDashboard = () => {
                         />
                         <div className="reply-actions">
                           <button className="icon-button">
-                           {/* <FiPaperclip />*/}
+                            <FiPaperclip />
                           </button>
                           <button 
                             className="primary-button small"
